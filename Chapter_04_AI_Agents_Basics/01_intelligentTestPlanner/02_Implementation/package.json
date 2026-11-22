@@ -1,0 +1,11 @@
+{
+  "name": "jira-test-plan-generator",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install --prefix src/backend && npm install --prefix src/frontend",
+    "dev": "concurrently \"npm run dev --prefix src/backend\" \"npm run dev --prefix src/frontend\"",
+    "start": "npm run dev --prefix src/backend",
+    "build": "npm run build --prefix src/frontend"
+  },
+  "devDependencies": { "concurrently": "^9.1.2" }
+}
