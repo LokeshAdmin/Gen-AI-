@@ -9,7 +9,7 @@ Minimal React + Express app for reading one Jira issue and producing the supplie
    - `JIRA_BASE_URL`
    - `JIRA_EMAIL`
    - `JIRA_API_TOKEN`
-3. Optional AI setting: `GROQ_MODEL` (defaults to `llama-3.3-70b-versatile`). You can enter a Groq API key on the Settings page; it is held in memory only for the current browser session and sent to the local backend for API calls.
+3. Optional AI setting: `GROQ_MODEL` (defaults to `openai/gpt-oss-20b`). You can enter a Groq API key on the Settings page; it is held in memory only for the current browser session and sent to the local backend for API calls.
 
 ## Run
 

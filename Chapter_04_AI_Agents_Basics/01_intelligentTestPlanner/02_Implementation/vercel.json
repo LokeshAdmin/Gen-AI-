@@ -1,0 +1,7 @@
+{
+  "buildCommand": "npm run install:all && npm run build",
+  "outputDirectory": "src/frontend/dist",
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/index.mjs" }
+  ]
+}

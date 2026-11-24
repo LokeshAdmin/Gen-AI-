@@ -8,7 +8,7 @@ function App() {
   const [plan, setPlan] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [settings, setSettings] = useState({ baseUrl: '', email: '', token: '', groqApiKey: '', groqModel: 'llama-3.3-70b-versatile' });
+  const [settings, setSettings] = useState({ baseUrl: '', email: '', token: '', groqApiKey: '', groqModel: 'openai/gpt-oss-20b' });
   const [connection, setConnection] = useState('');
   const [groqConnection, setGroqConnection] = useState('');
   const [planMode, setPlanMode] = useState('');

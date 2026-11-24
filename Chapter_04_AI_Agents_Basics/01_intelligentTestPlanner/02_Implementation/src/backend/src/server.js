@@ -65,8 +65,9 @@ function fallbackPlan(issue) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: model || process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+        model: model || process.env.GROQ_MODEL || 'openai/gpt-oss-20b',
         temperature: 0,
+        max_tokens: 2000,
         messages: [
           {
             role: 'system',
@@ -95,11 +96,22 @@ function fallbackPlan(issue) {
     });
 
     if (!response.ok) {
-      const error = new Error(response.status === 401 || response.status === 403
-        ? 'Groq rejected the API key. Check that the key is valid.'
-        : response.status === 429
-          ? 'Groq rate limit reached. Try again shortly.'
-          : 'Groq could not generate the test plan.');
+      let detail = '';
+      try {
+        const providerError = await response.json();
+        detail = providerError.error?.message || providerError.message || '';
+      } catch {}
+      let message;
+      if (response.status === 401 || response.status === 403) {
+        message = 'Groq rejected the API key. Check that the key is valid and has API access.';
+      } else if (response.status === 429) {
+        message = 'Groq quota or rate limit reached. Check usage limits in the Groq console and try again later.';
+      } else if (response.status === 404 && detail.includes('model')) {
+        message = `Groq model unavailable: ${detail}`;
+      } else {
+        message = `Groq generation failed (${response.status})${detail ? `: ${detail}` : '.'}`;
+      }
+      const error = new Error(message);
       error.status = response.status;
       throw error;
     }
@@ -153,9 +165,14 @@ app.post('/api/generate', async (req, res) => {
       : fallbackPlan(issue);
     res.json({ issueKey: issue.key, plan, source: 'Jira', mode: apiKey ? 'Groq AI' : 'template fallback' });
   } catch (error) {
-    res.status(error.status === 400 ? 400 : 502).json({ error: error.message || 'Unable to generate the test plan.' });
+    const status = [400, 401, 403, 404, 429].includes(error.status) ? error.status : 502;
+    res.status(status).json({ error: error.message || 'Unable to generate the test plan.' });
   }
 });
 
-const port = Number(process.env.PORT || 3001);
-app.listen(port, '127.0.0.1', () => console.log(`Backend running at http://127.0.0.1:${port}`));
+if (!process.env.VERCEL) {
+  const port = Number(process.env.PORT || 3001);
+  app.listen(port, '127.0.0.1', () => console.log(`Backend running at http://127.0.0.1:${port}`));
+}
+
+export default app;
